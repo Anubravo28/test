@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Brewed Book Cafe — Menu</title>
+    <!-- Preconnect for Google Fonts (fastest approach) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ─── DARK OLIVE PALETTE ─────────────────────────────── */
+        :root {
+            --olive-deep:    #375D3B;   /* darkest bg */
+            --olive-mid:     #3B5E36;   /* card surface */
+            --olive-soft:    #4f5830;   /* secondary surface */
+            --olive-border:  #c6c2a8;   /* borders */
+            --olive-muted:   #8a9460;   /* muted text */
+            --olive-light:   #3B6E47;   /* accent / price */
+            --olive-bright:  #d4e04a;   /* CTA highlight */
+            --cream:         #f0edd8;   /* primary text */
+            --cream-muted:   #c6c2a8;   /* secondary text */
+            --gold:          #c9a84c;   /* gold accent */
+            --red-cancel:    #c0392b;
+            --red-cancel-bg: #2a1010;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --header-h: 0px; /* set via JS */
+            --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        /* ─── RESET & BASE ───────────────────────────────────── */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 180px; }
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--olive-deep);
+            color: var(--cream);
+            padding-bottom: 130px;
+            min-height: 100vh;
+        }
+
+        /* ─── LOADER ─────────────────────────────────────────── */
+        #page-loader {
+            position: fixed; inset: 0;
+            background: var(--olive-deep);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        #page-loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loader-ring {
+            width: 46px; height: 46px;
+            border: 3px solid var(--olive-border);
+            border-top-color: var(--olive-bright);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .loader-text {
+            margin-top: 14px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--olive-muted);
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ─── SIDEBAR OVERLAY ────────────────────────────────── */
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+        .sidebar-overlay.show { opacity: 1; display: block; }
+
+        /* ─── HEADER ─────────────────────────────────────────── */
+        header {
+            position: sticky; top: 0;
+            background: rgba(44, 41, 30, 0.96);
+            backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--olive-border);
+            z-index: 1000;
+            padding: 14px 20px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-top-row {
+            width: 100%; max-width: 900px;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        header h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            font-weight: 700;
+            color: var(--cream);
+            letter-spacing: 0.06em;
+            text-align: center;
+            flex: 1;
+            line-height: 1.15;
+        }
+        header h1 span { color: var(--olive-bright); }
+        .table-banner {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--olive-muted);
+            background: var(--olive-mid);
+            border: 1px solid var(--olive-border);
+            border-radius: 30px;
+            padding: 4px 14px;
+            white-space: nowrap;
+        }
+        .header-bottom-row {
+            width: 100%; max-width: 900px;
+            display: flex; align-items: center;
+            gap: 10px;
+        }
+        .menu-toggle-btn {
+            background: var(--olive-mid);
+            border: 1px solid var(--olive-border);
+            color: var(--cream-muted);
+            font-size: 1.25rem;
+            line-height: 1;
+            cursor: pointer;
+            width: 40px; height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all var(--transition);
+        }
+        .menu-toggle-btn:hover { background: var(--olive-soft); color: var(--cream); }
+        .search-bar-input {
+            flex: 1;
+            padding: 10px 18px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.92rem;
+            background: var(--olive-mid);
+            color: var(--cream);
+            border: 1px solid var(--olive-border);
+            border-radius: 30px;
+            outline: none;
+            transition: all var(--transition);
+        }
+        .search-bar-input::placeholder { color: var(--olive-muted); }
+        .search-bar-input:focus {
+            border-color: var(--olive-bright);
+            box-shadow: 0 0 0 3px rgba(212,224,74,0.12);
+        }
+        .btn-admin-nav {
+            background: var(--olive-soft);
+            color: var(--cream-muted);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            border: 1px solid var(--olive-border);
+            white-space: nowrap;
+            transition: all var(--transition);
+            flex-shrink: 0;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .btn-admin-nav:hover {
+            background: var(--olive-bright);
+            color: var(--olive-deep);
+            border-color: var(--olive-bright);
+        }
+
+        /* ─── LAYOUT ─────────────────────────────────────────── */
+        .main-layout {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            padding: 0 16px;
+            display: flex;
+            gap: 26px;
+        }
+
+        /* ─── SIDEBAR ────────────────────────────────────────── */
+        .sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background: var(--olive-mid);
+            border: 1px solid var(--olive-border);
+            border-radius: var(--radius-lg);
+            padding: 20px 16px;
+            height: fit-content;
+            position: sticky;
+            top: 180px;
+        }
+        .sidebar h4 {
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--cream-muted);
+            margin-bottom: 14px;
+        }
+        .sidebar-item {
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: var(--olive-deep);
+            border: 1px solid var(--olive-border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-size: 0.92rem;
+            color: var(--cream-muted);
+        }
+        .sidebar-item:hover, .sidebar-item.active {
+            background: var(--olive-light);
+            border-color: var(--olive-bright);
+            color: var(--cream);
+        }
+
+        /* ─── CONTENT AREA ───────────────────────────────────── */
+        .content-area {
+            flex: 1;
+            min-width: 0;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--olive-bright);
+            margin-top: 36px;
+            margin-bottom: 18px;
+            letter-spacing: 0.03em;
+        }
+        .section-title:first-child { margin-top: 0; }
+
+        /* ─── MENU GRID ──────────────────────────────────────── */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 32px;
+        }
+        .card {
+            background: var(--olive-mid);
+            border: 1px solid var(--olive-border);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(212,224,74,0.1), transparent);
+            opacity: 0;
+            transition: opacity var(--transition);
+            pointer-events: none;
+        }
+        .card:hover {
+            border-color: var(--olive-bright);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+            transform: translateY(-4px);
+        }
+        .card:hover::before { opacity: 1; }
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--cream);
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        .card p {
+            font-size: 0.85rem;
+            color: var(--cream-muted);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: auto;
+        }
+        .price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--olive-bright);
+        }
+        .btn-add {
+            background: var(--olive-light);
+            color: var(--cream);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all var(--transition);
+            flex-shrink: 0;
+        }
+        .btn-add:hover {
+            background: var(--olive-bright);
+            color: var(--olive-deep);
+            transform: scale(1.05);
+        }
+
+        /* ─── CART DRAWER ────────────────────────────────────── */
+        .cart-drawer {
+            position: fixed;
+            bottom: 0; right: -100%;
+            width: 100%; max-width: 420px;
+            height: 100vh;
+            background: var(--olive-mid);
+            border-left: 1px solid var(--olive-border);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            transition: right var(--transition);
+            box-shadow: -4px 0 16px rgba(0,0,0,0.3);
+        }
+        .cart-drawer.open { right: 0; }
+        .cart-drawer-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--olive-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .cart-drawer-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--cream);
+        }
+        .btn-close-drawer {
+            background: none;
+            border: none;
+            color: var(--cream-muted);
+            cursor: pointer;
+            font-size: 1.4rem;
+            line-height: 1;
+            transition: color var(--transition);
+        }
+        .btn-close-drawer:hover { color: var(--cream); }
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+        }
+        .cart-item {
+            background: var(--olive-deep);
+            border: 1px solid var(--olive-border);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-item-info { flex: 1; }
+        .cart-item-title {
+            font-weight: 600;
+            color: var(--cream);
+            font-size: 0.95rem;
+        }
+        .cart-item-price {
+            color: var(--olive-bright);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+        .btn-remove-item {
+            background: var(--red-cancel-bg);
+            color: var(--red-cancel);
+            border: 1px solid var(--red-cancel);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all var(--transition);
+            flex-shrink: 0;
+        }
+        .btn-remove-item:hover {
+            background: var(--red-cancel);
+            color: white;
+        }
+
+        .cart-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--olive-border);
+            background: var(--olive-soft);
+        }
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--cream);
+        }
+        .cart-note-section {
+            margin-bottom: 14px;
+        }
+        .cart-note-section label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--cream-muted);
+            margin-bottom: 6px;
+        }
+        .cart-note-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--olive-mid);
+            color: var(--cream);
+            border: 1px solid var(--olive-border);
+            border-radius: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border var(--transition);
+        }
+        .cart-note-input:focus {
+            border-color: var(--olive-bright);
+        }
+        .btn-order {
+            width: 100%;
+            padding: 14px;
+            background: var(--olive-light);
+            color: var(--cream);
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .btn-order:hover:not(:disabled) {
+            background: var(--olive-bright);
+            color: var(--olive-deep);
+        }
+        .btn-order:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ─── FLOATING CART WIDGET ───────────────────────────── */
+        .floating-cart-widget {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            background: var(--olive-light);
+            color: var(--cream);
+            padding: 12px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            z-index: 1800;
+            transition: all var(--transition);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            border: 1px solid var(--olive-border);
+        }
+        .floating-cart-widget:hover {
+            background: var(--olive-bright);
+            color: var(--olive-deep);
+            transform: scale(1.08);
+        }
+        .floating-cart-widget.hidden {
+            display: none;
+        }
+        .cart-count {
+            background: var(--red-cancel);
+            color: white;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* ─── MODAL / POPUPS ─────────────────────────────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2500;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-card {
+            background: var(--olive-mid);
+            border: 1px solid var(--olive-border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-card h3 {
+            font-size: 1.4rem;
+            color: var(--cream);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        .modal-card p {
+            color: var(--cream-muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .btn-modal {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition);
+        }
+        .btn-modal-primary {
+            background: var(--olive-light);
+            color: var(--cream);
+        }
+        .btn-modal-primary:hover {
+            background: var(--olive-bright);
+            color: var(--olive-deep);
+        }
+        .btn-modal-secondary {
+            background: var(--olive-soft);
+            color: var(--cream-muted);
+            border: 1px solid var(--olive-border);
+        }
+        .btn-modal-secondary:hover {
+            background: var(--olive-border);
+            color: var(--cream);
+        }
+
+        /* ─── ORDER TRACKER ───────────────────────────────────── */
+        #customerOrderTracker {
+            position: fixed;
+            bottom: 20px; left: 20px;
+            background: var(--olive-mid);
+            border: 1px solid var(--olive-border);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            width: calc(100% - 40px);
+            max-width: 400px;
+            z-index: 1800;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            display: none;
+        }
+        .tracker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .tracker-header h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--olive-bright);
+        }
+        .tracker-close {
+            background: none;
+            border: none;
+            color: var(--cream-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color var(--transition);
+        }
+        .tracker-close:hover { color: var(--cream); }
+        .tracker-item {
+            font-size: 0.85rem;
+            color: var(--cream-muted);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .tracker-item strong { color: var(--cream); }
+        .tracker-status {
+            background: var(--olive-deep);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--olive-bright);
+            font-size: 0.9rem;
+        }
+        .tracker-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-tracker {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all var(--transition);
+        }
+        .btn-tracker-edit {
+            background: var(--olive-light);
+            color: var(--cream);
+        }
+        .btn-tracker-edit:hover {
+            background: var(--olive-bright);
+            color: var(--olive-deep);
+        }
+        .btn-tracker-cancel {
+            background: var(--red-cancel-bg);
+            color: var(--red-cancel);
+            border: 1px solid var(--red-cancel);
+        }
+        .btn-tracker-cancel:hover {
+            background: var(--red-cancel);
+            color: white;
+        }
+
+        /* ─── RESPONSIVE ─────────────────────────────────────── */
+        @media (max-width: 1024px) {
+            .main-layout {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .sidebar {
+                width: 100%;
+                position: static;
+                padding: 16px;
+                display: none;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 10px;
+            }
+            .sidebar.open {
+                display: grid;
+            }
+        }
+        @media (max-width: 768px) {
+            header { padding: 12px 16px; }
+            .menu-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 14px;
+            }
+            .cart-drawer {
+                max-width: 100%;
+            }
+            #customerOrderTracker {
+                width: calc(100% - 32px);
+                max-width: none;
+                bottom: 80px;
+                left: 16px;
+                right: 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            header h1 { font-size: 1.3rem; }
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .card { padding: 14px; }
+            .floating-cart-widget {
+                bottom: 12px; right: 12px;
+                padding: 10px 14px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Page Loader -->
+<div id="page-loader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Loading Menu...</div>
+</div>
+
+<!-- Sidebar Overlay (mobile) -->
+<div class="sidebar-overlay" id="menuOverlay"></div>
+
+<!-- Header -->
+<header>
+    <div class="header-top-row">
+        <div style="flex: 1;"></div>
+        <h1>🍝 Brewed<br><span>Book Cafe</span></h1>
+        <div style="flex: 1;"></div>
+    </div>
+    <div class="header-bottom-row">
+        <button class="menu-toggle-btn" onclick="openMobileSidebar()" id="mobileMenuBtn">☰</button>
+        <input type="text" class="search-bar-input" id="foodSearchBox" placeholder="Search menu..." onkeyup="filterFoodLedgerMenu()">
+        <a href="login.php" class="btn-admin-nav">🔐 Admin</a>
+    </div>
+</header>
+
+<!-- Main Layout -->
+<div class="main-layout">
+    <!-- Sidebar (Categories) -->
+    <aside class="sidebar" id="categoriesSidebar">
+        <h4>📋 Categories</h4>
+        <div class="sidebar-item active" onclick="handleCategoryClick(event, 'all-items')">All Items</div>
+        <div class="sidebar-item" onclick="handleCategoryClick(event, 'beverages')">☕ Beverages</div>
+        <div class="sidebar-item" onclick="handleCategoryClick(event, 'food')">🍽️ Food</div>
+    </aside>
+
+    <!-- Content Area (Menu Grid) -->
+    <div class="content-area">
+        <section id="all-items">
+            <h2 class="section-title">📖 Complete Menu</h2>
+            <div class="menu-grid" id="allMenuGrid"></div>
+        </section>
+
+        <section id="beverages" style="display:none;">
+            <h2 class="section-title">☕ Beverages</h2>
+            <div class="menu-grid" id="beverageGrid"></div>
+        </section>
+
+        <section id="food" style="display:none;">
+            <h2 class="section-title">🍽️ Food</h2>
+            <div class="menu-grid" id="foodGrid"></div>
+        </section>
+    </div>
+</div>
+
+<!-- Floating Cart Widget -->
+<div class="floating-cart-widget" id="floatingCart" onclick="toggleCartDrawer(true)">
+    <span>🛒 Cart</span>
+    <div class="cart-count" id="cartCount">0</div>
+</div>
+
+<!-- Cart Drawer -->
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <h2>Your Order</h2>
+        <button class="btn-close-drawer" onclick="toggleCartDrawer(false)">✕</button>
+    </div>
+    <div class="cart-items" id="cartItemsList"></div>
+    <div class="cart-footer">
+        <div class="cart-total">
+            <span>Total:</span>
+            <span id="cartTotalPrice">Rs. 0</span>
+        </div>
+        <div class="cart-note-section">
+            <label for="specialNotesInput">Special Requests:</label>
+            <textarea class="cart-note-input" id="specialNotesInput" placeholder="Any allergies or special requests?"></textarea>
+        </div>
+        <button class="btn-order" id="submitOrderBtn" onclick="submitOrderToBackend()">Send Order to Kitchen</button>
+    </div>
+</div>
+
+<!-- Order Tracker (Live Updates) -->
+<div id="customerOrderTracker">
+    <div class="tracker-header">
+        <h4 id="trackItemTitle">🍽 Live Order Tracking</h4>
+        <button class="tracker-close" onclick="document.getElementById('customerOrderTracker').style.display = 'none'">✕</button>
+    </div>
+    <div class="tracker-status" id="trackItemStatus">⏳ Preparing your order...</div>
+    <div class="tracker-item">Items: <strong id="trackItemsList">-</strong></div>
+    <div class="tracker-item" id="trackItemNote">Notes: <strong>None</strong></div>
+    <div class="tracker-item">Total: <strong id="trackItemTotal">Rs. 0</strong></div>
+    <div class="tracker-buttons">
+        <button class="btn-tracker btn-tracker-edit" onclick="triggerCustomerEdit()">✏️ Edit Note</button>
+        <button class="btn-tracker btn-tracker-cancel" onclick="triggerCustomerCancel()">❌ Cancel</button>
+    </div>
+</div>
+
+<!-- Success Popup -->
+<div class="modal-overlay" id="successPopup">
+    <div class="modal-card">
+        <h3>✅ Order Received!</h3>
+        <p id="popupMessage">Your order has been sent to the kitchen.</p>
+        <div class="modal-buttons">
+            <button class="btn-modal btn-modal-primary" onclick="closeNotificationPopup()">Got it!</button>
+        </div>
+    </div>
+</div>
+
+<!-- Session Expired Popup -->
+<div class="modal-overlay" id="sessionExpiredPopup">
+    <div class="modal-card">
+        <h3>⏳ Session Expired</h3>
+        <p>Your ordering session has expired. Please refresh the page or rescan the table QR code to continue.</p>
+        <div class="modal-buttons">
+            <button class="btn-modal btn-modal-primary" onclick="location.reload()">Refresh Page</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // ═══════════════════════════════════════════════════════════
+    // 🔧 CONFIGURATION & GLOBAL STATE
+    // ═══════════════════════════════════════════════════════════
+    
+    // Session management object
+    window.CAFE_SESSION = { token: null, expired: false };
+    
+    // Cart storage
+    var orderShoppingCart = [];
+    var activeTrackedOrderId = null;
+    
+    // Menu data structure
+    var MENU_DATA = [
+        // ☕ COFFEE & HOT BEVERAGES
+        { name: 'Americano Royale', price: 180, category: 'Beverages', keywords: 'coffee espresso' },
+        { name: 'Espresso Single', price: 120, category: 'Beverages', keywords: 'coffee shot' },
+        { name: 'Espresso Conpanna', price: 150, category: 'Beverages', keywords: 'espresso cream' },
+        { name: 'Cappuccino', price: 160, category: 'Beverages', keywords: 'coffee milk foam' },
+        { name: 'Cafe Latte', price: 170, category: 'Beverages', keywords: 'coffee milk' },
+        { name: 'Flat white', price: 170, category: 'Beverages', keywords: 'coffee espresso milk' },
+        { name: 'Matcha latte', price: 200, category: 'Beverages', keywords: 'green tea matcha' },
+        { name: 'Hot Chocolate', price: 140, category: 'Beverages', keywords: 'chocolate warm' },
+        { name: 'Green Tea Pot', price: 120, category: 'Beverages', keywords: 'tea green' },
+        
+        // 🍵 TEA / CHIYA
+        { name: 'Matka Tea', price: 80, category: 'Beverages', keywords: 'tea traditional' },
+        { name: 'Elaichi Chiya', price: 90, category: 'Beverages', keywords: 'tea cardamom' },
+        { name: 'Masala Chiya', price: 100, category: 'Beverages', keywords: 'tea spiced masala' },
+        
+        // 🥤 COLD DRINKS & SHAKES
+        { name: 'Sweet Lassi', price: 120, category: 'Beverages', keywords: 'yogurt cold' },
+        { name: 'Strawberry Lassi', price: 140, category: 'Beverages', keywords: 'yogurt fruit' },
+        { name: 'Banana Lassi', price: 140, category: 'Beverages', keywords: 'yogurt fruit' },
+        { name: 'Virgin Mojito', price: 180, category: 'Beverages', keywords: 'cocktail mint' },
+        { name: 'Blue Hawayain', price: 200, category: 'Beverages', keywords: 'cocktail tropical' },
+        { name: 'Mickey Mouse', price: 180, category: 'Beverages', keywords: 'shake' },
+        { name: 'Cinderella', price: 180, category: 'Beverages', keywords: 'shake' },
+        { name: 'Ice Americano', price: 180, category: 'Beverages', keywords: 'coffee cold' },
+        { name: 'Oreo Shake', price: 200, category: 'Beverages', keywords: 'shake' },
+        { name: 'Kitkat Shake', price: 200, category: 'Beverages', keywords: 'shake' },
+        { name: 'Watermelon Juice', price: 150, category: 'Beverages', keywords: 'juice fruit' },
+        
+        // 🍳 BREAKFAST & ROLLS
+        { name: 'Indian Breakfast', price: 280, category: 'Food', keywords: 'breakfast eggs' },
+        { name: 'bread omelet', price: 180, category: 'Food', keywords: 'breakfast eggs' },
+        { name: 'butter bread', price: 150, category: 'Food', keywords: 'breakfast bread' },
+        { name: 'American Breakfast', price: 320, category: 'Food', keywords: 'breakfast' },
+        { name: 'English Breakfast', price: 300, category: 'Food', keywords: 'breakfast' },
+        { name: 'Chicken Roll', price: 200, category: 'Food', keywords: 'roll chicken' },
+        { name: 'Veg Roll', price: 150, category: 'Food', keywords: 'roll vegetarian' },
+        
+        // 🥟 MO:MO ITEMS
+        { name: 'Chicken Steam Momo', price: 220, category: 'Food', keywords: 'momo dumpling' },
+        { name: 'Veg Steam Momo', price: 180, category: 'Food', keywords: 'momo vegetarian' },
+        { name: 'Chicken Fried Momo', price: 240, category: 'Food', keywords: 'momo dumpling' },
+        { name: 'Chicken C Momo', price: 250, category: 'Food', keywords: 'momo cheese' },
+        { name: 'Chicken Jhol Momo', price: 260, category: 'Food', keywords: 'momo gravy' },
+        
+        // 🍝 NOODLES & PASTA
+        { name: 'Current Noodles', price: 200, category: 'Food', keywords: 'noodles' },
+        { name: 'Chicken Noodles', price: 250, category: 'Food', keywords: 'noodles chicken' },
+        { name: 'Veg Noodles', price: 220, category: 'Food', keywords: 'noodles vegetarian' },
+        { name: 'Keema Noodles', price: 280, category: 'Food', keywords: 'noodles meat' },
+        { name: 'Spaghetti Napoitana', price: 280, category: 'Food', keywords: 'pasta' },
+        { name: 'Spaghetti Carbonara', price: 300, category: 'Food', keywords: 'pasta' },
+        
+        // 🍔 BURGER & SANDWICH
+        { name: 'Grilled Chicken Burger', price: 280, category: 'Food', keywords: 'burger chicken' },
+        { name: 'Crunchy Chicken Burger', price: 280, category: 'Food', keywords: 'burger chicken' },
+        { name: 'Crispy Veggie Burger', price: 240, category: 'Food', keywords: 'burger vegetarian' },
+        { name: 'Grilled Chicken Sandwich', price: 260, category: 'Food', keywords: 'sandwich chicken' },
+        { name: 'Club Sandwich Chi', price: 300, category: 'Food', keywords: 'sandwich' },
+        
+        // 🍕 PIZZA
+        { name: 'Pepperoni Pizza', price: 450, category: 'Food', keywords: 'pizza' },
+        { name: 'Marguerite Pizza', price: 400, category: 'Food', keywords: 'pizza vegetarian' },
+        { name: 'Mix Veg Pizza', price: 420, category: 'Food', keywords: 'pizza vegetarian' },
+        { name: 'Chicken Pizza', price: 480, category: 'Food', keywords: 'pizza chicken' },
+        { name: 'Barbeque Chicken Pizza', price: 500, category: 'Food', keywords: 'pizza chicken' },
+        
+        // 🥗 VEG STARTERS
+        { name: 'Mushroom Choila', price: 220, category: 'Food', keywords: 'starter vegetarian' },
+        { name: 'Paneer Pakoda', price: 240, category: 'Food', keywords: 'starter vegetarian' },
+        { name: 'Mix Veg Pakoda', price: 200, category: 'Food', keywords: 'starter vegetarian' },
+        { name: 'French fries', price: 120, category: 'Food', keywords: 'fries potato' },
+        { name: 'Paneer chilly', price: 280, category: 'Food', keywords: 'starter vegetarian' },
+        { name: 'Mustang alu', price: 200, category: 'Food', keywords: 'starter potato' },
+        { name: 'Veg Quesadilla', price: 260, category: 'Food', keywords: 'starter vegetarian' },
+        { name: 'Dynamite Fries', price: 180, category: 'Food', keywords: 'fries spicy' },
+        
+        // 🍗 NON-VEG STARTERS
+        { name: 'Drumstick', price: 280, category: 'Food', keywords: 'starter chicken' },
+        { name: 'Chicken Nuggets', price: 240, category: 'Food', keywords: 'starter chicken' },
+        { name: 'Hot wings', price: 300, category: 'Food', keywords: 'starter chicken spicy' },
+        { name: 'Chicken Chilly', price: 300, category: 'Food', keywords: 'starter chicken' },
+        { name: 'Chicken Quesadilla', price: 320, category: 'Food', keywords: 'starter chicken' },
+        { name: 'Spicy Garlic Wings', price: 320, category: 'Food', keywords: 'starter chicken' },
+        
+        // 🍛 RICE & CURRY
+        { name: 'Chicken Szechwan Rice', price: 320, category: 'Food', keywords: 'rice chicken' },
+        { name: 'Chicken Biryani', price: 350, category: 'Food', keywords: 'rice chicken' },
+        { name: 'Chicken Curry', price: 300, category: 'Food', keywords: 'curry chicken' },
+        { name: 'Mix Veg Curry', price: 250, category: 'Food', keywords: 'curry vegetarian' },
+        { name: 'Veg Biryani', price: 280, category: 'Food', keywords: 'rice vegetarian' },
+        
+        // 🍲 SOUP & SALAD
+        { name: 'Fruits Salad', price: 200, category: 'Food', keywords: 'salad fresh' },
+        { name: 'Chicken Ceaser Salad', price: 280, category: 'Food', keywords: 'salad chicken' },
+        { name: 'Hot & sour soup Chicken', price: 220, category: 'Food', keywords: 'soup chicken' },
+        { name: 'Mushroom soup Chicken', price: 240, category: 'Food', keywords: 'soup chicken' },
+        
+        // 🍱 SETS & PLATTERS
+        { name: 'Chicken Khaja Set', price: 500, category: 'Food', keywords: 'platter set' },
+        { name: 'Veg Khaja Set', price: 420, category: 'Food', keywords: 'platter set' },
+        { name: 'Wings Platter', price: 600, category: 'Food', keywords: 'platter chicken' },
+        { name: 'Wings Platters', price: 600, category: 'Food', keywords: 'platter chicken' },
+        { name: 'Momo Platter', price: 450, category: 'Food', keywords: 'platter momo' }
+    ];
+
+    // ═══════════════════════════════════════════════════════════
+    // 📱 INITIALIZATION
+    // ═══════════════════════════════════════════════════════════
+
+    window.addEventListener('load', function() {
+        initializePageLoader();
+        initializeSessionToken();
+        renderMenuGrids();
+        loadTrackedOrder();
+        document.getElementById('page-loader').classList.add('hidden');
+    });
+
+    // Generate session token on page load
+    function initializeSessionToken() {
+        fetch('submit.php', {
+            method: 'POST',
+            body: new FormData(Object.assign(new FormData(), { action: 'start_session' }))
+        })
+        .then(r => r.json())
+        .catch(e => console.log('Session init optional:', e));
+    }
+
+    function initializePageLoader() {
+        setTimeout(function() {
+            document.getElementById('page-loader').classList.add('hidden');
+        }, 800);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 🔐 SESSION MANAGEMENT
+    // ═══════════════════════════════════════════════════════════
+
+    function hasActiveSession() {
+        return window.CAFE_SESSION.token && !window.CAFE_SESSION.expired;
+    }
+
+    function showSessionExpiredPopup() {
+        document.getElementById('sessionExpiredPopup').classList.add('show');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 🎨 MENU RENDERING
+    // ═══════════════════════════════════════════════════════════
+
+    function renderMenuGrids() {
+        var beverages = MENU_DATA.filter(item => item.category === 'Beverages');
+        var food = MENU_DATA.filter(item => item.category === 'Food');
+
+        renderGrid('allMenuGrid', MENU_DATA);
+        renderGrid('beverageGrid', beverages);
+        renderGrid('foodGrid', food);
+    }
+
+    function renderGrid(gridId, items) {
+        var grid = document.getElementById(gridId);
+        grid.innerHTML = '';
+        
+        items.forEach(function(item) {
+            var card = document.createElement('div');
+            card.className = 'card';
+            card.setAttribute('data-keywords', item.keywords);
+            card.innerHTML = 
+                '<h3>' + item.name + '</h3>' +
+                '<p>Delicious flavor, fresh ingredients</p>' +
+                '<div class="card-footer">' +
+                    '<div class="price">Rs. ' + item.price + '</div>' +
+                    '<button class="btn-add" onclick="addToCart(\'' + item.name.replace(/'/g, "\\'") + '\', ' + item.price + ')">Add</button>' +
+                '</div>';
+            grid.appendChild(card);
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 🛒 CART MANAGEMENT
+    // ═══════════════════════════════════════════════════════════
+
+    window.addToCart = function(itemName, itemPrice) {
+        orderShoppingCart.push({ name: itemName, price: itemPrice });
+        updateFloatingCartWidget();
+        alert('✅ Added to cart: ' + itemName);
+    };
+
+    function updateFloatingCartWidget() {
+        var count = orderShoppingCart.length;
+        document.getElementById('cartCount').textContent = count;
+        document.getElementById('floatingCart').classList.toggle('hidden', count === 0);
+        renderCartItems();
+    }
+
+    function renderCartItems() {
+        var container = document.getElementById('cartItemsList');
+        container.innerHTML = '';
+        var total = 0;
+
+        orderShoppingCart.forEach(function(item, idx) {
+            total += item.price;
+            var cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML =
+                '<div class="cart-item-info">' +
+                    '<div class="cart-item-title">' + item.name + '</div>' +
+                    '<div class="cart-item-price">Rs. ' + item.price + '</div>' +
+                '</div>' +
+                '<button class="btn-remove-item" onclick="removeFromCart(' + idx + ')">Remove</button>';
+            container.appendChild(cartItem);
+        });
+
+        document.getElementById('cartTotalPrice').textContent = 'Rs. ' + total;
+    }
+
+    window.removeFromCart = function(idx) {
+        orderShoppingCart.splice(idx, 1);
+        updateFloatingCartWidget();
+    };
+
+    window.toggleCartDrawer = function(open) {
+        document.getElementById('cartDrawer').classList.toggle('open', open);
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // 📤 ORDER SUBMISSION
+    // ═══════════════════════════════════════════════════════════
+
+    window.submitOrderToBackend = function() {
+        if (orderShoppingCart.length === 0) {
+            alert('Cart is empty! Add items first.');
+            return;
+        }
+
+        var btn = document.getElementById('submitOrderBtn');
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+
+        var itemsStr = orderShoppingCart.map(i => i.name).join(', ');
+        var finalPrice = orderShoppingCart.reduce((sum, i) => sum + i.price, 0);
+        var notesStr = document.getElementById('specialNotesInput').value;
+        var tableForPost = document.querySelector('.table-banner').textContent || 'Takeaway';
+
+        var fd = new FormData();
+        fd.append('item', itemsStr);
+        fd.append('price', finalPrice);
+        fd.append('table_number', tableForPost);
+        fd.append('note', notesStr);
+        fd.append('session_token', CAFE_SESSION.token || '');
+
+        fetch('submit.php', { method: 'POST', body: fd })
+            .then(function(resp) {
+                return resp.text().then(function(text) {
+                    try { return JSON.parse(text); }
+                    catch(e) { throw new Error(text || 'Server returned an unexpected response.'); }
+                });
+            })
+            .then(function(data) {
+                btn.textContent = 'Send Order to Kitchen';
+                btn.disabled = false;
+
+                if (data.session_expired) {
+                    CAFE_SESSION.expired = true;
+                    showSessionExpiredPopup();
+                    return;
+                }
+
+                if (data.status === 'success') {
+                    document.getElementById('popupMessage').innerHTML =
+                        'Your order for <strong>' + data.item + '</strong> has been received by the kitchen!';
+                    document.getElementById('successPopup').classList.add('show');
+
+                    activeTrackedOrderId = data.order_id;
+
+                    document.getElementById('trackItemTitle').textContent = '🍽 Live Order Tracking';
+                    document.getElementById('trackItemsList').textContent = 'Items: ' + itemsStr;
+                    document.getElementById('trackItemTotal').textContent = 'Total: Rs. ' + finalPrice;
+                    document.getElementById('trackItemNote').textContent  = notesStr ? 'Notes: "' + notesStr + '"' : 'Notes: None';
+                    document.getElementById('customerOrderTracker').style.display = 'block';
+
+                    try {
+                        sessionStorage.setItem('activeTrackedOrder', JSON.stringify({ id: data.order_id, note: notesStr, items: itemsStr, total: finalPrice }));
+                    } catch(e) { /* sessionStorage unavailable — tracker just won't survive a refresh */ }
+
+                    orderShoppingCart = [];
+                    updateFloatingCartWidget();
+                    toggleCartDrawer(false);
+                } else {
+                    alert('Server error: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(function(err) {
+                btn.textContent = 'Send Order to Kitchen';
+                btn.disabled = false;
+                alert('Order error: ' + err.message);
+            });
+    };
+
+    /* ── EDIT NOTE ─── */
+    window.triggerCustomerEdit = function() {
+        var revisedNote = prompt('Modify your special request for this order:');
+        if (revisedNote === null) return;
+
+        if (!activeTrackedOrderId) { alert('No active order to edit.'); return; }
+
+        if (!hasActiveSession()) {
+            showSessionExpiredPopup();
+            return;
+        }
+
+        var fd = new FormData();
+        fd.append('action', 'customer_edit');
+        fd.append('order_id', activeTrackedOrderId);
+        fd.append('note', revisedNote);
+        fd.append('session_token', CAFE_SESSION.token || '');
+
+        fetch('submit.php', { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.session_expired) {
+                    CAFE_SESSION.expired = true;
+                    showSessionExpiredPopup();
+                    return;
+                }
+
+                if (data.status === 'success') {
+                    document.getElementById('trackItemNote').textContent =
+                        revisedNote ? 'Notes: "' + revisedNote + '"' : 'Notes: None';
+
+                    try {
+                        var saved = JSON.parse(sessionStorage.getItem('activeTrackedOrder'));
+                        if (saved && saved.id) {
+                            saved.note = revisedNote;
+                            sessionStorage.setItem('activeTrackedOrder', JSON.stringify(saved));
+                        }
+                    } catch(e) { /* sessionStorage unavailable — safe to ignore */ }
+
+                    alert('✅ Note updated in the kitchen dashboard!');
+                } else {
+                    alert('Could not edit: ' + data.message);
+                }
+            })
+            .catch(function(err) { alert('Network error: ' + err.message); });
+    };
+
+    /* ── CANCEL ORDER ─── */
+    window.triggerCustomerCancel = function() {
+        if (!confirm('Cancel your order? The kitchen will be notified.')) return;
+
+        if (!activeTrackedOrderId) { alert('No active order to cancel.'); return; }
+
+        if (!hasActiveSession()) {
+            showSessionExpiredPopup();
+            return;
+        }
+
+        var fd = new FormData();
+        fd.append('action', 'customer_cancel');
+        fd.append('order_id', activeTrackedOrderId);
+        fd.append('session_token', CAFE_SESSION.token || '');
+
+        fetch('submit.php', { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.session_expired) {
+                    CAFE_SESSION.expired = true;
+                    showSessionExpiredPopup();
+                    return;
+                }
+
+                if (data.status === 'success') {
+                    document.getElementById('customerOrderTracker').style.display = 'none';
+                    activeTrackedOrderId = null;
+
+                    try { sessionStorage.removeItem('activeTrackedOrder'); } catch(e) { /* safe to ignore */ }
+
+                    alert('❌ Order cancelled successfully.');
+                } else {
+                    alert('Could not cancel: ' + data.message);
+                }
+            })
+            .catch(function(err) { alert('Network error: ' + err.message); });
+    };
+
+    /* ── CLOSE POPUP ─── */
+    window.closeNotificationPopup = function() {
+        document.getElementById('successPopup').classList.remove('show');
+    };
+
+    /* ── SIDEBAR MOBILE ─── */
+    window.openMobileSidebar = function() {
+        document.getElementById('categoriesSidebar').classList.add('open');
+        document.getElementById('menuOverlay').classList.add('show');
+    };
+    window.closeMobileSidebar = function() {
+        document.getElementById('categoriesSidebar').classList.remove('open');
+        document.getElementById('menuOverlay').classList.remove('show');
+    };
+
+    window.handleCategoryClick = function(e, targetId) {
+        closeMobileSidebar();
+    };
+
+    /* ── SEARCH FILTER ─── */
+    window.filterFoodLedgerMenu = function() {
+        var query = document.getElementById('foodSearchBox').value.toLowerCase().trim();
+        var cards = document.querySelectorAll('.menu-grid .card');
+
+        cards.forEach(function(card) {
+            var title    = card.querySelector('h3').textContent.toLowerCase();
+            var desc     = card.querySelector('p') ? card.querySelector('p').textContent.toLowerCase() : '';
+            var price    = card.querySelector('.price').textContent.toLowerCase();
+            var keywords = card.getAttribute('data-keywords') || '';
+
+            if (title.indexOf(query) > -1 || desc.indexOf(query) > -1 || price.indexOf(query) > -1 || keywords.indexOf(query) > -1) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    };
+
+    // Load tracked order from session if exists
+    function loadTrackedOrder() {
+        try {
+            var saved = JSON.parse(sessionStorage.getItem('activeTrackedOrder'));
+            if (saved && saved.id) {
+                activeTrackedOrderId = saved.id;
+                document.getElementById('trackItemsList').textContent = 'Items: ' + saved.items;
+                document.getElementById('trackItemNote').textContent = 'Notes: "' + saved.note + '"';
+                document.getElementById('trackItemTotal').textContent = 'Total: Rs. ' + saved.total;
+                document.getElementById('customerOrderTracker').style.display = 'block';
+            }
+        } catch(e) { /* safe to ignore */ }
+    }
+
+})();
+</script>
+</body>
+</html>

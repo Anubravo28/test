@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "env": [
+    {
+      "key": "SUPABASE_URL",
+      "value": "YOUR_SUPABASE_PROJECT_URL"
+    },
+    {
+      "key": "SUPABASE_KEY",
+      "value": "YOUR_SUPABASE_ANON_KEY"
+    },
+    {
+      "key": "ADMIN_PASSWORD",
+      "value": "6028"
+    },
+    {
+      "key": "JWT_SECRET",
+      "value": "admin_jwt_secret_2026"
+    },
+    {
+      "key": "SESSION_SECRET",
+      "value": "brewedbook_cafe_qr_session_secret_2026"
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/api/.*",
+      "dest": "/api/$1.js",
+      "methods": ["GET", "POST", "OPTIONS"]
+    },
+    {
+      "src": "^/(?!api).*",
+      "dest": "/index.html",
+      "status": 200
+    }
+  ],
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18.x",
+      "memory": 512,
+      "maxDuration": 10
+    }
+  }
+}

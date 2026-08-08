@@ -1,0 +1,30 @@
+{
+  "name": "brewed-book-cafe",
+  "version": "1.0.0",
+  "description": "Online Menu & Ordering System for Brewed Book Cafe",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step needed for static site'",
+    "test": "echo 'Add tests here'"
+  },
+  "keywords": [
+    "cafe",
+    "ordering",
+    "menu",
+    "supabase",
+    "vercel"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4",
+    "jsonwebtoken": "^9.1.0"
+  },
+  "devDependencies": {
+    "vercel": "^28.0.0"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
