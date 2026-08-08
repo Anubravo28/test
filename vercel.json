@@ -1,27 +1,12 @@
 {
   "version": 2,
-  "env": [
-    {
-      "key": "SUPABASE_URL",
-      "value": "https://mhtrwhpkzciswdbzghyz.supabase.co"
-    },
-    {
-      "key": "SUPABASE_KEY",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1odHJ3aHBremNpc3dkYnpnaHl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNjk3NTcsImV4cCI6MjEwMTc0NTc1N30.w5NXl6jFO6EfpzRUZDyWbHbQ0ctEPdKoiJs0OefUJHs"
-    },
-    {
-      "key": "ADMIN_PASSWORD",
-      "value": "6028"
-    },
-    {
-      "key": "JWT_SECRET",
-      "value": "admin_jwt_secret_2026"
-    },
-    {
-      "key": "SESSION_SECRET",
-      "value": "brewedbook_cafe_qr_session_secret_2026"
-    }
-  ],
+  "env": {
+    "SUPABASE_URL": "YOUR_SUPABASE_PROJECT_URL",
+    "SUPABASE_KEY": "YOUR_SUPABASE_ANON_KEY",
+    "ADMIN_PASSWORD": "6028",
+    "JWT_SECRET": "admin_jwt_secret_2026",
+    "SESSION_SECRET": "brewedbook_cafe_qr_session_secret_2026"
+  },
   "routes": [
     {
       "src": "^/api/.*",
