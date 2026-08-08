@@ -3,11 +3,11 @@
   "env": [
     {
       "key": "SUPABASE_URL",
-      "value": "YOUR_SUPABASE_PROJECT_URL"
+      "value": "https://mhtrwhpkzciswdbzghyz.supabase.co"
     },
     {
       "key": "SUPABASE_KEY",
-      "value": "YOUR_SUPABASE_ANON_KEY"
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1odHJ3aHBremNpc3dkYnpnaHl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNjk3NTcsImV4cCI6MjEwMTc0NTc1N30.w5NXl6jFO6EfpzRUZDyWbHbQ0ctEPdKoiJs0OefUJHs"
     },
     {
       "key": "ADMIN_PASSWORD",
